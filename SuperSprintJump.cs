@@ -27,7 +27,7 @@ namespace SuperSprintJump
 
             jumpMultiplier = Config.Bind("General", "Jump Height", 1.0f,
                 new ConfigDescription("Player jump height multiplier",
-                new AcceptableValueRange<float>(1.0f, 10.0f)));
+                new AcceptableValueRange<float>(1.0f, 20.0f)));
 
             noFallDamage = Config.Bind("General", "NoFallDamage", false,
                 new ConfigDescription("Fall damage is auto divided by Jump Height coef. This is for zero fall damage"));
@@ -116,7 +116,19 @@ namespace SuperSprintJump
 
                 if (player == gameWorld.MainPlayer && __instance.IsSprintEnabled)
                 {
-                    __result *= SpeedControlPlugin.sprintSpeedMultiplier.Value;
+                    float sprintMult = SpeedControlPlugin.sprintSpeedMultiplier.Value;
+                    float jumpMult = SpeedControlPlugin.jumpMultiplier.Value;
+
+                    float finalMult = sprintMult;
+
+                    if (jumpMult > sprintMult)
+                    {
+                        if (jumpMult > 2f)
+                        {
+                            finalMult *= (jumpMult / 2f);
+                        }
+                    }
+                    __result *= finalMult;
                 }
             }
         }
@@ -134,9 +146,22 @@ namespace SuperSprintJump
 
                 if (player == gameWorld.MainPlayer && __instance.MovementContext.IsSprintEnabled)
                 {
-                    motion *= SpeedControlPlugin.sprintSpeedMultiplier.Value;
+                    float sprintMult = SpeedControlPlugin.sprintSpeedMultiplier.Value;
+                    float jumpMult = SpeedControlPlugin.jumpMultiplier.Value;
+
+                    float finalMult = sprintMult;
+
+                    if (jumpMult > sprintMult)
+                    {
+                        if (jumpMult > 2f)
+                        {
+                            finalMult *= (jumpMult / 2f);
+                        }
+                    }
+                    motion *= finalMult;
                 }
             }
         }
+
     }
 }
