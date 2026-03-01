@@ -21,16 +21,16 @@ namespace SuperSprintJump
         {
             logger = Logger;
 
-            sprintSpeedMultiplier = Config.Bind("General", "Sprint Speed", 1.0f,
-                new ConfigDescription("Player sprint speed multiplier",
+            sprintSpeedMultiplier = Config.Bind("General", "Sprint Speed Multiplier", 1.0f,
+                new ConfigDescription("Only affect yourself",
                 new AcceptableValueRange<float>(1.0f, 2.0f)));
 
-            jumpMultiplier = Config.Bind("General", "Jump Height", 1.0f,
-                new ConfigDescription("Player jump height multiplier",
+            jumpMultiplier = Config.Bind("General", "Jump Height Multiplier", 1.0f,
+                new ConfigDescription("If this > 2.0, Sprint Speed will = origin * JumpHeight / 2",
                 new AcceptableValueRange<float>(1.0f, 20.0f)));
 
             noFallDamage = Config.Bind("General", "NoFallDamage", false,
-                new ConfigDescription("Fall damage is auto divided by Jump Height coef. This is for zero fall damage"));
+                new ConfigDescription("Fall damage is auto divided by Jump Height coef. This will remove fall damage."));
 
             harmony = new Harmony("ciallo.SuperSprintJump");
             harmony.PatchAll();
