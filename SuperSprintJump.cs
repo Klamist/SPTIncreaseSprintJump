@@ -27,10 +27,12 @@ namespace SuperSprintJump
                 new AcceptableValueRange<float>(1.0f, 20.0f)));
 
             speedBreakLimit = Config.Bind("General", "Sprint Speed Overlimit (?)", false,
-                new ConfigDescription("Break physical speed limit.\nBuggy: uphill obstacled and downhill floated"));
+                new ConfigDescription("Break physical speed limit.\n" +
+                "Buggy: Speed > 3x will get uphill obstacled and downhill floated, and >10x might run into ground and die."));
 
             jumpMultiplier = Config.Bind("General", "Jump Height Multiplier", 1.0f,
-                new ConfigDescription("If lower than sprint coef, will limit jump distance.",
+                new ConfigDescription("Sprint+Jump distance depends on Sprint Speed coef.\n" +
+                "Recommend coef: sprint > jump/2. Sprint overlimit won't affect jump, can be disabled if use high sprint coef.",
                 new AcceptableValueRange<float>(1.0f, 20.0f)));
 
             noFallDamage = Config.Bind("General", "No Fall Damage (?)", false,
@@ -155,9 +157,9 @@ namespace SuperSprintJump
 
                 if (player == gameWorld.MainPlayer && __instance.MovementContext.IsSprintEnabled)
                 {
-                    Vector3 forward = player.Transform.forward;
                     float mult = SpeedControlPlugin.sprintSpeedMultiplier.Value;
-                    player.Transform.position += forward * mult * deltaTime;
+                    Vector3 current_motion = new Vector3(motion.x, motion.y, motion.z) * (mult - 1f);
+                    player.Transform.position += current_motion * deltaTime;
                 }
             }
         }
