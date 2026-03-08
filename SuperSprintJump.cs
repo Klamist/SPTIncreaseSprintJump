@@ -8,13 +8,14 @@ using UnityEngine;
 
 namespace SuperSprintJump
 {
-    [BepInPlugin("ciallo.SuperSprintJump", "Super Sprint Jump", "1.2.0")]
+    [BepInPlugin("ciallo.SuperSprintJump", "Super Sprint Jump", "1.2.1")]
     public class SpeedControlPlugin : BaseUnityPlugin
     {
         private static ConfigEntry<float> sprintSpeedMultiplier;
         private static ConfigEntry<bool> speedBreakLimit;
         private static ConfigEntry<float> jumpMultiplier;
         private static ConfigEntry<bool> noFallDamage;
+        private static ConfigEntry<bool> walkacc;
 
         private static ConfigEntry<float> sprintStep;
         private static ConfigEntry<KeyboardShortcut> increaseSpeedKey;
@@ -49,9 +50,12 @@ namespace SuperSprintJump
             noFallDamage = Config.Bind("General", "No Fall Damage (?)", false,
                 new ConfigDescription("Fall damage is auto divided by Jump Height coef. This is for remove fall damage."));
 
+            walkacc = Config.Bind("General", "Walk Acceleration (?)", false,
+                new ConfigDescription("Speed multiplier also works on normal W A S D walking."));
+
             sprintStep = Config.Bind("Hotkeys", "Sprint Changing Step", 0.25f);
-            decreaseSpeedKey = Config.Bind("Hotkeys", "Sprint Speed -", new KeyboardShortcut(KeyCode.None));
-            increaseSpeedKey = Config.Bind("Hotkeys", "Sprint Speed +", new KeyboardShortcut(KeyCode.None));
+            decreaseSpeedKey = Config.Bind("Hotkeys", "Sprint Speed -", new KeyboardShortcut(KeyCode.KeypadMinus));
+            increaseSpeedKey = Config.Bind("Hotkeys", "Sprint Speed +", new KeyboardShortcut(KeyCode.KeypadPlus));
             jumpStep = Config.Bind("Hotkeys", "Jump Changing Step", 0.5f);
             decreaseJumpKey = Config.Bind("Hotkeys", "Jump Height -", new KeyboardShortcut(KeyCode.None));
             increaseJumpKey = Config.Bind("Hotkeys", "Jump Height +", new KeyboardShortcut(KeyCode.None));
@@ -154,7 +158,7 @@ namespace SuperSprintJump
                 var playerField = AccessTools.Field(typeof(MovementContext), "_player");
                 Player player = (Player)playerField.GetValue(__instance);
 
-                if (player == gameWorld.MainPlayer && __instance.IsSprintEnabled)
+                if (player == gameWorld.MainPlayer && (__instance.IsSprintEnabled || SpeedControlPlugin.walkacc.Value))
                 {
                     __result *= SpeedControlPlugin.sprintSpeedMultiplier.Value;
                 }
@@ -172,7 +176,7 @@ namespace SuperSprintJump
                 var playerField = AccessTools.Field(typeof(MovementContext), "_player");
                 Player player = (Player)playerField.GetValue(__instance.MovementContext);
 
-                if (player == gameWorld.MainPlayer && __instance.MovementContext.IsSprintEnabled)
+                if (player == gameWorld.MainPlayer && (__instance.MovementContext.IsSprintEnabled || SpeedControlPlugin.walkacc.Value))
                 {
                     motion *= SpeedControlPlugin.sprintSpeedMultiplier.Value;
                 }
@@ -189,7 +193,7 @@ namespace SuperSprintJump
                 var playerField = AccessTools.Field(typeof(MovementContext), "_player");
                 Player player = (Player)playerField.GetValue(__instance.MovementContext);
 
-                if (player == gameWorld.MainPlayer && __instance.MovementContext.IsSprintEnabled)
+                if (player == gameWorld.MainPlayer && (__instance.MovementContext.IsSprintEnabled || SpeedControlPlugin.walkacc.Value))
                 {
                     float mult = SpeedControlPlugin.sprintSpeedMultiplier.Value;
                     Vector3 current_motion = new Vector3(motion.x, motion.y, motion.z) * (mult - 1f);

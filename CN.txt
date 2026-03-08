@@ -16,6 +16,9 @@ Super 冲刺移速 跳跃高度
             noFallDamage = Config.Bind("General", "移除坠落伤害 (?)", false,
                 new ConfigDescription("坠落伤害已经默认÷跳高倍率，此选项会完全移除摔伤"));
 
+            walkacc = Config.Bind("General", "普通移动也加速 (?)", false,
+                new ConfigDescription("速度倍率对普通WASD走路也生效"));
+
             sprintStep = Config.Bind("快捷键", "冲刺移速每次增减", 0.25f);
             decreaseSpeedKey = Config.Bind("快捷键", "冲刺速度 -", new KeyboardShortcut(KeyCode.None));
             increaseSpeedKey = Config.Bind("快捷键", "冲刺速度 +", new KeyboardShortcut(KeyCode.None));
@@ -26,3 +29,6 @@ Super 冲刺移速 跳跃高度
             guiEnabled = Config.Bind("状态栏", "左下角倍率提示", true);
             guiPosX = Config.Bind("状态栏", "文字x坐标", 100);
             guiPosY = Config.Bind("状态栏", "文字y坐标", Screen.height - 150);
+
+                string text = $"冲刺 = {SpeedControlPlugin.sprintSpeedMultiplier.Value:F2}x\n" +
+                              $"跳高 = {SpeedControlPlugin.jumpMultiplier.Value:F2}x";
