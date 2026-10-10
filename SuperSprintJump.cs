@@ -3,12 +3,13 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
+using EFT.HealthSystem;
 using HarmonyLib;
 using UnityEngine;
 
 namespace SuperSprintJump
 {
-    [BepInPlugin("ciallo.SuperSprintJump", "Super Sprint Jump", "1.2.1")]
+    [BepInPlugin("ciallo.SuperSprintJump", "Super Sprint Jump", "2.0.0")]
     public class SpeedControlPlugin : BaseUnityPlugin
     {
         private static ConfigEntry<float> sprintSpeedMultiplier;
@@ -86,10 +87,10 @@ namespace SuperSprintJump
         }
 
         // 跳跃高度
-        [HarmonyPatch(typeof(JumpStateClass), "Enter")]
+        [HarmonyPatch(typeof(JumpPlayerState), "Enter")]
         class Patch_JumpEnter
         {
-            static void Postfix(JumpStateClass __instance)
+            static void Postfix(JumpPlayerState __instance)
             {
                 var gameWorld = Singleton<GameWorld>.Instance;
                 if (gameWorld?.MainPlayer == null) return;
@@ -99,7 +100,7 @@ namespace SuperSprintJump
 
                 if (player == gameWorld.MainPlayer)
                 {
-                    __instance.Vector3_1 *= Mathf.Sqrt(jumpMultiplier.Value);
+                    __instance._liftForce *= Mathf.Sqrt(jumpMultiplier.Value);
                 }
             }
         }
@@ -122,7 +123,7 @@ namespace SuperSprintJump
                     }
                     else if (jumpMultiplier.Value > 1.0f)
                     {
-                        float num = height - __instance.FallSafeHeight_1;
+                        float num = height - __instance._fallSafeHeight;
                         if (!num.Positive())
                         {
                             __result = 0f;
@@ -130,13 +131,13 @@ namespace SuperSprintJump
                         }
 
                         float damage = num * Mathf.Sqrt(num) *
-                                       GClass3009<EFT.HealthSystem.ActiveHealthController.GClass3008>.GClass1728_0.Falling.DamagePerMeter *
+                                       BaseHealthController<ActiveHealthController.Effect>._settings.Falling.DamagePerMeter *
                                        __instance.Player.Physical.FallDamageMultiplier;
 
                         damage /= jumpMultiplier.Value;
 
-                        __instance.ApplyDamage(EBodyPart.LeftLeg, damage, GClass3051.FallDamage);
-                        __instance.ApplyDamage(EBodyPart.RightLeg, damage, GClass3051.FallDamage);
+                        __instance.ApplyDamage(EBodyPart.LeftLeg, damage, DamageHelper.FallDamage);
+                        __instance.ApplyDamage(EBodyPart.RightLeg, damage, DamageHelper.FallDamage);
 
                         __result = damage;
                         return false;
